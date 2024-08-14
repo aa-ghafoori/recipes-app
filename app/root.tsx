@@ -1,13 +1,78 @@
 import {
   Links,
   Meta,
+  NavLink,
   Outlet,
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import "./tailwind.css";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import stylesheet from "~/tailwind.css?url";
+import {
+  AppIcon,
+  DiscoverIcon,
+  HomeIcon,
+  SettingsIcon,
+} from "./components/icons";
+import classNames from "classnames";
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: stylesheet },
+];
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Recipe App" },
+    { name: "description", content: "Welcome to Recipe App!" },
+  ];
+};
+
+function App() {
+  return (
+    <div className="md:flex">
+      <nav className="md:h-screen bg-primary">
+        <ul className="flex justify-center md:flex-col">
+          <AppNavLink to="/">
+            <HomeIcon />
+          </AppNavLink>
+          <AppNavLink to="discover">
+            <DiscoverIcon />
+          </AppNavLink>
+          <AppNavLink to="app">
+            <AppIcon />
+          </AppNavLink>
+          <AppNavLink to="settings">
+            <SettingsIcon />
+          </AppNavLink>
+        </ul>
+      </nav>
+      <Outlet />
+    </div>
+  );
+}
+
+type AppNavLinkProps = {
+  children: React.ReactNode;
+  to: string;
+};
+
+const AppNavLink = ({ children, to }: AppNavLinkProps) => (
+  <li>
+    <NavLink to={to}>
+      {({ isActive }) => (
+        <div
+          className={classNames("text-white px-8 py-6 hover:bg-primary-light", {
+            "bg-primary-light": isActive,
+          })}
+        >
+          {children}
+        </div>
+      )}
+    </NavLink>
+  </li>
+);
+
+export default function Root() {
   return (
     <html lang="en">
       <head>
@@ -17,14 +82,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <App />
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
   );
-}
-
-export default function App() {
-  return <Outlet />;
 }
